@@ -5,10 +5,24 @@ const usersSeed = require('./users');
 const gameDataSeed = require('./gameData');
 const adminSettingsSeed = require('./adminSettings');
 
-const dataDirectory = process.env.DATA_DIR || __dirname;
-const dbPath = path.join(dataDirectory, 'db.json');
-
 const clone = (value) => JSON.parse(JSON.stringify(value));
+
+const resolveDataDirectory = () => {
+  const preferredDirectory = process.env.DATA_DIR || __dirname;
+
+  try {
+    fs.mkdirSync(preferredDirectory, { recursive: true });
+    const testPath = path.join(preferredDirectory, '.write-test');
+    fs.writeFileSync(testPath, 'ok');
+    fs.unlinkSync(testPath);
+    return preferredDirectory;
+  } catch (error) {
+    return __dirname;
+  }
+};
+
+const dataDirectory = resolveDataDirectory();
+const dbPath = path.join(dataDirectory, 'db.json');
 
 const createSeedDatabase = () => ({
   users: clone(usersSeed),
