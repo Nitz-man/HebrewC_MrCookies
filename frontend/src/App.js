@@ -13,7 +13,7 @@ import AdminAnalytics from './pages/AdminAnalytics';
 import GeneratedMusicPlayer from './components/GeneratedMusicPlayer';
 import './styles/App.css';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_URL = process.env.REACT_APP_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:5000/api');
 
 function App() {
   const [user, setUser] = useState(null);
