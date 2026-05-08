@@ -16,6 +16,53 @@ const createSeedDatabase = () => ({
   adminSettings: clone(adminSettingsSeed)
 });
 
+const normalizeDatabase = (database) => {
+  const normalized = database && typeof database === 'object' ? database : {};
+
+  if (!Array.isArray(normalized.users)) {
+    normalized.users = clone(usersSeed);
+  }
+
+  if (!normalized.gameData || typeof normalized.gameData !== 'object') {
+    normalized.gameData = clone(gameDataSeed);
+  }
+
+  if (!Array.isArray(normalized.gameData.wordBank)) {
+    normalized.gameData.wordBank = clone(gameDataSeed.wordBank);
+  }
+
+  if (!normalized.adminSettings || typeof normalized.adminSettings !== 'object') {
+    normalized.adminSettings = clone(adminSettingsSeed);
+  } else {
+    normalized.adminSettings = {
+      ...clone(adminSettingsSeed),
+      ...normalized.adminSettings,
+      appTheme: {
+        ...clone(adminSettingsSeed.appTheme),
+        ...(normalized.adminSettings.appTheme || {})
+      },
+      layout: {
+        ...clone(adminSettingsSeed.layout),
+        ...(normalized.adminSettings.layout || {})
+      },
+      sounds: {
+        ...clone(adminSettingsSeed.sounds),
+        ...(normalized.adminSettings.sounds || {})
+      },
+      notifications: {
+        ...clone(adminSettingsSeed.notifications),
+        ...(normalized.adminSettings.notifications || {})
+      },
+      gameSettings: {
+        ...clone(adminSettingsSeed.gameSettings),
+        ...(normalized.adminSettings.gameSettings || {})
+      }
+    };
+  }
+
+  return normalized;
+};
+
 const ensureDatabase = () => {
   if (!fs.existsSync(dbPath)) {
     fs.mkdirSync(dataDirectory, { recursive: true });
@@ -25,7 +72,17 @@ const ensureDatabase = () => {
 
 const readDatabase = () => {
   ensureDatabase();
-  return JSON.parse(fs.readFileSync(dbPath, 'utf8'));
+  try {
+    const database = normalizeDatabase(JSON.parse(fs.readFileSync(dbPath, 'utf8')));
+    writeDatabase(database);
+    return database;
+  } catch (error) {
+    const backupPath = path.join(dataDirectory, `db-invalid-${Date.now()}.json`);
+    fs.copyFileSync(dbPath, backupPath);
+    const database = createSeedDatabase();
+    writeDatabase(database);
+    return database;
+  }
 };
 
 const writeDatabase = (database) => {

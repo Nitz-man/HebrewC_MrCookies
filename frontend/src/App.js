@@ -14,16 +14,17 @@ import GeneratedMusicPlayer from './components/GeneratedMusicPlayer';
 import './styles/App.css';
 
 const API_URL = process.env.REACT_APP_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:5000/api');
+const DEFAULT_APP_THEME = {
+  primaryColor: '#6366f1',
+  secondaryColor: '#ec4899',
+  backgroundColor: '#f8fafc',
+  textColor: '#1e293b'
+};
 
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [appSettings, setAppSettings] = useState({
-    primaryColor: '#6366f1',
-    secondaryColor: '#ec4899',
-    backgroundColor: '#f8fafc',
-    textColor: '#1e293b'
-  });
+  const [appSettings, setAppSettings] = useState(DEFAULT_APP_THEME);
   const [musicEnabled, setMusicEnabled] = useState(true);
 
   useEffect(() => {
@@ -55,7 +56,7 @@ function App() {
     try {
       const response = await fetch(`${API_URL}/admin/settings`);
       const data = await response.json();
-      setAppSettings(data.appTheme);
+      setAppSettings({ ...DEFAULT_APP_THEME, ...(data.appTheme || {}) });
       setMusicEnabled(data.sounds?.enabled !== false);
     } catch (error) {
       console.log('Using default settings');
@@ -80,7 +81,7 @@ function App() {
 
   return (
     <Router>
-      <div className="App" style={{ '--primary-color': appSettings.primaryColor, '--secondary-color': appSettings.secondaryColor }}>
+      <div className="App" style={{ '--primary-color': appSettings.primaryColor || DEFAULT_APP_THEME.primaryColor, '--secondary-color': appSettings.secondaryColor || DEFAULT_APP_THEME.secondaryColor }}>
         <Routes>
           {/* Public Routes */}
           <Route 
