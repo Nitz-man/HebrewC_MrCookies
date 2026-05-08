@@ -1,5 +1,5 @@
 // API utility for making requests
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+import { API_URL } from './config';
 
 export const apiCall = async (endpoint, options = {}) => {
   const token = localStorage.getItem('token');
