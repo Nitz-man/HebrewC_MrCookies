@@ -1,0 +1,32 @@
+.music-toggle {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 20;
+  border: 0;
+  border-radius: 8px;
+  background: #111827;
+  color: #ffffff;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  min-width: 92px;
+  padding: 11px 14px;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.22);
+}
+
+.music-toggle:hover {
+  background: #374151;
+}
+
+.music-toggle.is-playing {
+  background: #047857;
+}
+
+@media (max-width: 600px) {
+  .music-toggle {
+    bottom: 12px;
+    right: 12px;
+  }
+}
